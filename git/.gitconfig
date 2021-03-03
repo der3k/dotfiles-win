@@ -1,0 +1,17 @@
+[user]
+	name = der3k
+	email =
+
+[credential]
+	helper = manager
+
+[core]
+	editor = nvim
+	autocrlf = input
+
+[alias]
+	co = checkout
+	ci = commit
+	st = status
+	br = branch
+	hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
