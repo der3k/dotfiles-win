@@ -1,4 +1,4 @@
-#InstallKeybdHook
+ï»¿#InstallKeybdHook
 #Persistent
 #HotkeyInterval,100
 #NoEnv
@@ -15,16 +15,90 @@ EnvGet, viewer, USER_VIEWER
 
 SetWorkingDir %desktop%
 
-:O:lho::localhost
-:O:rsi.::rsi.news@quick.cz
-:O:739.::739524873
-:O:sl.::Slezská 1851/40
-:O:ct.::Èeský Tìšín
-:O:psc.::73701
-:O:op.::012846595
+:?:lh::localhost
+:O:rsi,::rsi.news@quick.cz
+:O:739,::739524873
+:O:sl,::SlezskÃ¡ 1851/40
+:O:ct,::ÄŒeskÃ½ TÄ›Å¡Ã­n
+:O:psc,::73701
+:O:op,::012846595
+
+
+*<!h::
+  WinGetPos, x, y, w, h, A
+  if (x <= 0)
+  {
+     if (w <= A_ScreenWidth / 4)
+     {
+       ; left padded small + pad_left => pad_left_big
+       WinMove A,, 0, y, A_ScreenWidth / 2, h
+     }
+     else
+     {
+       ; left padded big + pad_left => pad_left_small
+       WinMove A,, 0, y, A_ScreenWidth / 4, h
+     }
+  }
+  else if (x + w >= A_ScreenWidth)
+  { ; right padded + pad_left => center
+    WinMove A,, A_ScreenWidth / 4, 0, A_ScreenWidth / 2, A_ScreenHeight
+  }
+  else
+  { ; ? + pad_left => pad_left
+    WinMove A,, 0, 0, A_ScreenWidth / 4, A_ScreenHeight
+  }
+return
+
+*<!l::
+  WinGetPos, x, y, w, h, A
+  if (x <= 0)
+  { ; left padded + pad_right => center
+    WinMove A,, A_ScreenWidth / 4, 0, A_ScreenWidth / 2, A_ScreenHeight
+  }
+  else if (x + w >= A_ScreenWidth)
+  {
+     if (w <= A_ScreenWidth / 4)
+     {
+       ; right padded small + pad_right => pad_right_big
+       WinMove A,, A_ScreenWidth - A_ScreenWidth / 2, y, A_ScreenWidth / 2, h
+     }
+     else
+     {
+       ; right padded big + pad_right => pad_right_small
+       WinMove A,, A_ScreenWidth - A_ScreenWidth / 4, y, A_ScreenWidth / 4, h
+     }
+  }
+  else
+  { ; ? + pad_right => pad_right
+    WinMove A,, A_ScreenWidth - A_ScreenWidth / 4, 0, A_ScreenWidth / 4, A_ScreenHeight
+  }
+return
+
+*<!k::
+  WinGetPos, x, y, w, h, A
+  if (h < A_ScreenHeight)
+  { ; ? + up => full height
+    WinMove A,, x, 0, w, A_ScreenHeight
+  }
+  else
+  { ; full height + up => top half height
+    WinMove A,, x, 0, w, A_ScreenHeight / 2
+  }
+return
+
+*<!j::
+  WinGetPos, x, y, w, h, A
+  if (h < A_ScreenHeight)
+  { ; ? + down => full height
+    WinMove A,, x, 0, w, A_ScreenHeight
+  }
+  else
+  { ; full height + down => bottom half height
+    WinMove A,, x, A_ScreenHeight / 2, w, A_ScreenHeight / 2
+  }
+return
 
 #+r::
-  ;SendInput ^s
   Reload
 return
 
@@ -92,8 +166,8 @@ F7::createDirFromWinTitle()
 
 openDosFromWinTitle() {
   global
-  WinGetTitle dir
-  Run, %console% /K cd /D "%dir%"
+  WinGetTitle dird
+  Run, %console% -d "%dir%"
 }
 
 openSelection() {
@@ -223,4 +297,3 @@ showAppWin(winTitle, appPath) {
     Run %appPath%
   }
 }
-
