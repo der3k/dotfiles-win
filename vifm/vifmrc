@@ -1,1 +1,22 @@
+set vicmd=nvy
+set syscalls
+set norunexec
+set history=100
+
+set confirm-=delete
+
+filetype * explorer %"f:p &
+
+nnoremap s :!wt -w 0 -d %"d &<cr>
+nnoremap o :!nvy %"f &<cr>
+nnoremap ,c :write | edit $MYVIFMRC | restart full &<cr>
+
+nnoremap yp :!echo "%d:gs!\!/!%i"| clip &<cr>
+nnoremap yP :!echo %"d%i| clip &<cr>
+nnoremap yf :!echo %f:p%i| clip &<cr>
+nnoremap yF :!echo %"f:p%i| clip &<cr>
+nnoremap yn :!echo %f%i| clip &<cr>
+nnoremap yN :!echo %"f%i| clip &<cr>
+
+colorscheme juef-zenburn
 only
