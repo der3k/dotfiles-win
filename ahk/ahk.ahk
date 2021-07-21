@@ -23,9 +23,9 @@ SetWorkingDir %desktop%
 :O:psc,::73701
 :O:op,::012846595
 
-$Space::Send,{Space}
+#If GetKeyState("Space", "P")
 
-Space & h::
+h::
   WinGetPos, x, y, w, h, A
   if (x <= 0)
   {
@@ -50,7 +50,7 @@ Space & h::
   }
 return
 
-Space & l::
+l::
   WinGetPos, x, y, w, h, A
   if (x <= 0)
   { ; left padded + pad_right => center
@@ -75,7 +75,7 @@ Space & l::
   }
 return
 
-Space & k::
+k::
   WinGetPos, x, y, w, h, A
   if (h < A_ScreenHeight)
   { ; ? + up => full height
@@ -87,7 +87,7 @@ Space & k::
   }
 return
 
-Space & j::
+j::
   WinGetPos, x, y, w, h, A
   if (h < A_ScreenHeight)
   { ; ? + down => full height
@@ -98,6 +98,8 @@ Space & j::
     WinMove A,, x, A_ScreenHeight / 2, w, A_ScreenHeight / 2
   }
 return
+
+#If
 
 #+r::
   Reload
