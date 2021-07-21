@@ -23,8 +23,9 @@ SetWorkingDir %desktop%
 :O:psc,::73701
 :O:op,::012846595
 
+$Space::Send,{Space}
 
-*<!h::
+Space & h::
   WinGetPos, x, y, w, h, A
   if (x <= 0)
   {
@@ -49,7 +50,7 @@ SetWorkingDir %desktop%
   }
 return
 
-*<!l::
+Space & l::
   WinGetPos, x, y, w, h, A
   if (x <= 0)
   { ; left padded + pad_right => center
@@ -74,7 +75,7 @@ return
   }
 return
 
-*<!k::
+Space & k::
   WinGetPos, x, y, w, h, A
   if (h < A_ScreenHeight)
   { ; ? + up => full height
@@ -86,7 +87,7 @@ return
   }
 return
 
-*<!j::
+Space & j::
   WinGetPos, x, y, w, h, A
   if (h < A_ScreenHeight)
   { ; ? + down => full height
