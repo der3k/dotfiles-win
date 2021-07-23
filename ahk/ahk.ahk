@@ -23,59 +23,98 @@ SetWorkingDir %desktop%
 :O:psc,::73701
 :O:op,::012846595
 
-#If GetKeyState("Space", "P")
-
-h::
+*<!h:: ; LEFT
   WinGetPos, x, y, w, h, A
+  relWidth := Round((w / A_ScreenWidth) * 100, 2)
   if (x <= 0)
-  {
-     if (w <= A_ScreenWidth / 4)
-     {
-       ; left padded small + pad_left => pad_left_big
-       WinMove A,, 0, y, A_ScreenWidth / 2, h
+  { ; left padded
+     if (relWidth<= 25)
+     { ; on 25% or less => 33.33% left padded 
+        WinMove A,, 0, y, A_ScreenWidth / 3, h
+     }
+     else if (relWidth <= 33.33)
+     { ; on 33.33% or less => 50% left padded 
+        WinMove A,, 0, y, A_ScreenWidth / 2, h
+     }
+     else if (relWidth <= 50)
+     { ; on 50% or less => 66.66% left padded 
+        WinMove A,, 0, y, A_ScreenWidth * 0.66, h
      }
      else
-     {
-       ; left padded big + pad_left => pad_left_small
-       WinMove A,, 0, y, A_ScreenWidth / 4, h
+     { ; ? => 25% left padded 
+        WinMove A,, 0, y, A_ScreenWidth / 4, h
      }
   }
-  else if (x + w >= A_ScreenWidth)
+  else if (x + w >= (A_ScreenWidth - 5))
   { ; right padded + pad_left => center
-    WinMove A,, A_ScreenWidth / 4, 0, A_ScreenWidth / 2, A_ScreenHeight
+    if (relWidth <= 25)
+    {
+       WinMove A,, A_ScreenWidth / 4, 0, A_ScreenWidth / 2, A_ScreenHeight
+    }
+    else
+    {
+       WinMove A,, A_ScreenWidth / 3, 0, A_ScreenWidth / 3, A_ScreenHeight
+    }
   }
   else
   { ; ? + pad_left => pad_left
-    WinMove A,, 0, 0, A_ScreenWidth / 4, A_ScreenHeight
+     WinMove A,, 0, y, A_ScreenWidth / 3, h
   }
 return
 
-l::
+*<!l::
   WinGetPos, x, y, w, h, A
+  relWidth := Round((w / A_ScreenWidth) * 100, 2)
   if (x <= 0)
   { ; left padded + pad_right => center
-    WinMove A,, A_ScreenWidth / 4, 0, A_ScreenWidth / 2, A_ScreenHeight
+    if (relWidth <= 25)
+    {
+      WinMove A,, A_ScreenWidth / 4, 0, A_ScreenWidth / 2, A_ScreenHeight
+    }
+    else
+    {
+      WinMove A,, A_ScreenWidth / 3, 0, A_ScreenWidth / 3, A_ScreenHeight
+    }
   }
-  else if (x + w >= A_ScreenWidth)
-  {
-     if (w <= A_ScreenWidth / 4)
-     {
-       ; right padded small + pad_right => pad_right_big
+  else if (x + w >= (A_ScreenWidth - 5))
+  { ; right padded
+     if (relWidth <= 25)
+     { ; on 25% or less => 33.33% right padded 
+       WinMove A,, A_ScreenWidth - A_ScreenWidth / 3, y, A_ScreenWidth / 3, h
+     }
+     else if (relWidth <= 33.33)
+     { ; on 33.33% or less => 50% right padded 
        WinMove A,, A_ScreenWidth - A_ScreenWidth / 2, y, A_ScreenWidth / 2, h
      }
+     else if (relWidth <= 50)
+     { ; on 50% or less => 66.66% right padded 
+       WinMove A,, A_ScreenWidth - A_ScreenWidth * 0.66, y, A_ScreenWidth * 0.66, h
+     }
      else
-     {
-       ; right padded big + pad_right => pad_right_small
+     { ; ? => 25% right padded 
        WinMove A,, A_ScreenWidth - A_ScreenWidth / 4, y, A_ScreenWidth / 4, h
      }
   }
   else
-  { ; ? + pad_right => pad_right
-    WinMove A,, A_ScreenWidth - A_ScreenWidth / 4, 0, A_ScreenWidth / 4, A_ScreenHeight
+  { ; ? => 33.33% right padded 
+     WinMove A,, A_ScreenWidth - A_ScreenWidth / 3, y, A_ScreenWidth / 3, h
   }
 return
 
-k::
+*<!i::
+  WinGetPos, x, y, w, h, A
+  relWidth := Round((w / A_ScreenWidth) * 100, 2)
+  if (relWidth > 33.33 || (x <=0 && relWidth > 25) || ((x + w >= (A_ScreenWidth - 5) && relWidth > 25)))
+  { 
+    WinMove A,, A_ScreenWidth / 3, 0, A_ScreenWidth / 3, A_ScreenHeight
+  }
+  else
+  { 
+    WinMove A,, A_ScreenWidth / 4, 0, A_ScreenWidth / 2, A_ScreenHeight
+  }
+return
+
+*<!k::
   WinGetPos, x, y, w, h, A
   if (h < A_ScreenHeight)
   { ; ? + up => full height
@@ -87,7 +126,7 @@ k::
   }
 return
 
-j::
+*<!j::
   WinGetPos, x, y, w, h, A
   if (h < A_ScreenHeight)
   { ; ? + down => full height
@@ -98,8 +137,6 @@ j::
     WinMove A,, x, A_ScreenHeight / 2, w, A_ScreenHeight / 2
   }
 return
-
-#If
 
 #+r::
   Reload
