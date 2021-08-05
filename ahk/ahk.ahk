@@ -23,85 +23,63 @@ SetWorkingDir %desktop%
 :O:psc,::73701
 :O:op,::012846595
 
-*<!h:: ; LEFT
+*<!h:: ; PAD LEFT
   WinGetPos, x, y, w, h, A
   relWidth := Round((w / A_ScreenWidth) * 100, 2)
   if (x <= 0)
-  { ; left padded
+  { ; active window is left padded
      if (relWidth<= 25)
-     { ; on 25% or less => 33.33% left padded 
+     { ; on 25% or less => PAD LEFT 33.33%
         WinMove A,, 0, y, A_ScreenWidth / 3, h
      }
      else if (relWidth <= 33.33)
-     { ; on 33.33% or less => 50% left padded 
+     { ; on 33.33% or less => PAD LEFT 50%
         WinMove A,, 0, y, A_ScreenWidth / 2, h
      }
      else if (relWidth <= 50)
-     { ; on 50% or less => 66.66% left padded 
+     { ; on 50% or less => PAD LEFT 66.66%
         WinMove A,, 0, y, A_ScreenWidth * 0.66, h
      }
      else
-     { ; ? => 25% left padded 
+     { ; ? => 25% left padded => PAD LEFT 25% 
         WinMove A,, 0, y, A_ScreenWidth / 4, h
      }
   }
-  else if (x + w >= (A_ScreenWidth - 5))
-  { ; right padded + pad_left => center
-    if (relWidth <= 25)
-    {
-       WinMove A,, A_ScreenWidth / 4, 0, A_ScreenWidth / 2, A_ScreenHeight
-    }
-    else
-    {
-       WinMove A,, A_ScreenWidth / 3, 0, A_ScreenWidth / 3, A_ScreenHeight
-    }
-  }
   else
-  { ; ? + pad_left => pad_left
+  { ; PAD LEFT 33.33%
      WinMove A,, 0, y, A_ScreenWidth / 3, h
   }
 return
 
-*<!l::
+*<!l:: ; PAD RIGHT
   WinGetPos, x, y, w, h, A
   relWidth := Round((w / A_ScreenWidth) * 100, 2)
-  if (x <= 0)
-  { ; left padded + pad_right => center
-    if (relWidth <= 25)
-    {
-      WinMove A,, A_ScreenWidth / 4, 0, A_ScreenWidth / 2, A_ScreenHeight
-    }
-    else
-    {
-      WinMove A,, A_ScreenWidth / 3, 0, A_ScreenWidth / 3, A_ScreenHeight
-    }
-  }
-  else if (x + w >= (A_ScreenWidth - 5))
-  { ; right padded
+  if (x + w >= (A_ScreenWidth - 5))
+  { ; active window is right padded
      if (relWidth <= 25)
-     { ; on 25% or less => 33.33% right padded 
+     { ; on 25% or less => PAD RIGHT 33.33%
        WinMove A,, A_ScreenWidth - A_ScreenWidth / 3, y, A_ScreenWidth / 3, h
      }
      else if (relWidth <= 33.33)
-     { ; on 33.33% or less => 50% right padded 
+     { ; on 33.33% or less => PAD RIGHT 50%
        WinMove A,, A_ScreenWidth - A_ScreenWidth / 2, y, A_ScreenWidth / 2, h
      }
      else if (relWidth <= 50)
-     { ; on 50% or less => 66.66% right padded 
+     { ; on 50% or less => PAD RIGHT 66.66%
        WinMove A,, A_ScreenWidth - A_ScreenWidth * 0.66, y, A_ScreenWidth * 0.66, h
      }
      else
-     { ; ? => 25% right padded 
+     { ; ? => PAD RIGHT 25%
        WinMove A,, A_ScreenWidth - A_ScreenWidth / 4, y, A_ScreenWidth / 4, h
      }
   }
   else
-  { ; ? => 33.33% right padded 
+  { ; ? => PAD RIGHT 33.33%
      WinMove A,, A_ScreenWidth - A_ScreenWidth / 3, y, A_ScreenWidth / 3, h
   }
 return
 
-*<!i::
+*<!i:: ; CENTER
   WinGetPos, x, y, w, h, A
   relWidth := Round((w / A_ScreenWidth) * 100, 2)
   if (relWidth > 33.33 || (x <=0 && relWidth > 25) || ((x + w >= (A_ScreenWidth - 5) && relWidth > 25)))
@@ -114,7 +92,7 @@ return
   }
 return
 
-*<!k::
+*<!k:: ; UP
   WinGetPos, x, y, w, h, A
   if (h < A_ScreenHeight)
   { ; ? + up => full height
@@ -126,7 +104,7 @@ return
   }
 return
 
-*<!j::
+*<!j:: ; DOWN
   WinGetPos, x, y, w, h, A
   if (h < A_ScreenHeight)
   { ; ? + down => full height
@@ -137,6 +115,9 @@ return
     WinMove A,, x, A_ScreenHeight / 2, w, A_ScreenHeight / 2
   }
 return
+
+*<!n::WinMinimize, A
+*<!m::AltTab
 
 #+r::
   Reload
