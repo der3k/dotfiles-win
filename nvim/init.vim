@@ -110,6 +110,7 @@ inoremap <C-Space> <C-n>
 set relativenumber
 
 call plug#begin('~/vimfiles/plugged')
+Plug 'joshdick/onedark.vim'
 " Plug 'vim-scripts/L9'
 " Plug 'itchyny/lightline.vim'
 " Plug 'vim-airline/vim-airline'
@@ -179,7 +180,7 @@ let g:netrw_list_hide = &wildignore
 nmap <leader>t :Lex<CR>
 map <leader>b :BuffergatorToggle<CR>
 
-" colorscheme materialbox
+colorscheme onedark
 " set background=dark
 
 set splitbelow
@@ -229,6 +230,7 @@ set ignorecase
 " set foldlevelstart=2
 
 au FileType sql setl formatprg=pg_format\ -
+
 set list
 set shortmess+=AIOTWaot
 if has("gui_running")

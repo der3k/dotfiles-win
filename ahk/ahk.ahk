@@ -80,6 +80,12 @@ return
 return
 
 *<!i:: ; CENTER
+  WinGet, maximized, MinMax, A
+  if (maximized = 1)
+  {
+    WinRestore, A
+    return
+  }
   WinGetPos, x, y, w, h, A
   relWidth := Round((w / A_ScreenWidth) * 100, 2)
   if (relWidth > 33.33 || (x <=0 && relWidth > 25) || ((x + w >= (A_ScreenWidth - 5) && relWidth > 25)))
