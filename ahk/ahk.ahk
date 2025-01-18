@@ -247,16 +247,10 @@ createDir() {
 
 }
 
-openSelectionInNotepadP() {
-	global
-  selection := getSelection()
-  Run "%editor%" "%selection%"
-}
-
 openSelectionInViewer() {
 	global
   selection := getSelection()
-  Run "%viewer%" "%selection%"
+  Run %viewer% "%selection%"
 }
 
 #+q::WinSet AlwaysOnTop, Toggle, A
