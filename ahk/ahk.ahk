@@ -15,43 +15,45 @@ EnvGet, viewer, USER_VIEWER
 
 SetWorkingDir %desktop%
 
-:?:lh::localhost
-:O:rsi,::rsi.news@quick.cz
-:O:739,::739524873
-:O:sl,::Slezská 1851/40
-:O:ct,::Český Těšín
-:O:psc,::73701
-:O:op,::012846595
+:O*:e,,::rsi.news@quick.cz
+:O*:eg,,::richard.sikora@gmail.com
+:O*:et,,::richard.sikora@tietoevry.com
+:O*:t,,::739524873
+:O*:s,,::Slezská 1851/40
+:TO*:n,,::Nádražní 42/4
+:O*:c,,::Český Těšín
+:O*:p,,::73701
+:O*:o,,::012846595
 
-*<!h:: ; PAD LEFT
++<^h:: ; PAD LEFT
   WinGetPos, x, y, w, h, A
   relWidth := Round((w / A_ScreenWidth) * 100, 2)
   if (x <= 0)
   { ; active window is left padded
      if (relWidth<= 25)
      { ; on 25% or less => PAD LEFT 33.33%
-        WinMove A,, 0, y, A_ScreenWidth / 3, h
+        WinMove A,, -4, y, A_ScreenWidth / 3, h
      }
      else if (relWidth <= 33.33)
      { ; on 33.33% or less => PAD LEFT 50%
-        WinMove A,, 0, y, A_ScreenWidth / 2, h
+        WinMove A,, -4, y, A_ScreenWidth / 2, h
      }
      else if (relWidth <= 50)
      { ; on 50% or less => PAD LEFT 66.66%
-        WinMove A,, 0, y, A_ScreenWidth * 0.66, h
+        WinMove A,, -4, y, A_ScreenWidth * 0.66, h
      }
      else
      { ; ? => 25% left padded => PAD LEFT 25% 
-        WinMove A,, 0, y, A_ScreenWidth / 4, h
+        WinMove A,, -4, y, A_ScreenWidth / 4, h
      }
   }
   else
   { ; PAD LEFT 33.33%
-     WinMove A,, 0, y, A_ScreenWidth / 3, h
+     WinMove A,, -4, 0, A_ScreenWidth / 3, A_ScreenHeight + 7
   }
 return
 
-*<!l:: ; PAD RIGHT
++<^l:: ; PAD RIGHT
   WinGetPos, x, y, w, h, A
   relWidth := Round((w / A_ScreenWidth) * 100, 2)
   if (x + w >= (A_ScreenWidth - 5))
@@ -75,11 +77,11 @@ return
   }
   else
   { ; ? => PAD RIGHT 33.33%
-     WinMove A,, A_ScreenWidth - A_ScreenWidth / 3, y, A_ScreenWidth / 3, h
+     WinMove A,, A_ScreenWidth - A_ScreenWidth / 3, 0, A_ScreenWidth / 3 + 14, A_ScreenHeight + 7
   }
 return
 
-*<!i:: ; CENTER
++<^i:: ; CENTER
   WinGet, maximized, MinMax, A
   if (maximized = 1)
   {
@@ -90,15 +92,15 @@ return
   relWidth := Round((w / A_ScreenWidth) * 100, 2)
   if (relWidth > 33.33 || (x <=0 && relWidth > 25) || ((x + w >= (A_ScreenWidth - 5) && relWidth > 25)))
   { 
-    WinMove A,, A_ScreenWidth / 3, 0, A_ScreenWidth / 3, A_ScreenHeight
+    WinMove A,, A_ScreenWidth / 3 - 18, 0, A_ScreenWidth / 3 + 36, A_ScreenHeight + 7
   }
   else
   { 
-    WinMove A,, A_ScreenWidth / 4, 0, A_ScreenWidth / 2, A_ScreenHeight
+    WinMove A,, A_ScreenWidth / 4 - 18, 0, A_ScreenWidth / 2 + 36, A_ScreenHeight + 7
   }
 return
 
-*<!k:: ; UP
++<^k:: ; UP
   WinGetPos, x, y, w, h, A
   if (h < A_ScreenHeight)
   { ; ? + up => full height
@@ -110,7 +112,7 @@ return
   }
 return
 
-*<!j:: ; DOWN
++<^j:: ; DOWN
   WinGetPos, x, y, w, h, A
   if (h < A_ScreenHeight)
   { ; ? + down => full height
@@ -123,27 +125,20 @@ return
 return
 
 *<!n::WinMinimize, A
-*<!m::AltTab
 
-#+r::
-  Reload
-return
-
-^#l::
-  selection := getSelection()
-  FileGetAttrib, attribs, %selection%
-  If attribs = ""
-     return
-  IfInString, attribs, D
-  { 
-    StringGetPos, i, selection, `\,R
-    StringMid, name, selection, i + 2
-   }
+*<!m::
+  if WinActive("ahk_exe CDViewer.exe")
+  {
+    SendInput {Ctrl down}q{Ctrl up}
+  }
   else
   {
-    SplitPath, selection, name
+    Send {Alt down}{Tab}
   }
-  FileCreateShortcut, %selection%,  C:\etc\links\%name%.lnk
+return
+
++<^r::
+  Reload
 return
 
 #a::
@@ -156,21 +151,9 @@ return
   SendInput %timeStamp%
 return
 
-; Desktop
-#IfWinActive, ahk_class Progman
-F3::openSelectionInViewer()
-F4::openSelection()
-+F4::createFileOnPath(desktop)
-F7::createDirOnPath(desktop)
-^d::Run, %console%, desktop
-#IfWinActive
-
-; Desktop of Win7
-#IfWinActive, ahk_class WorkerW
-F3::openSelectionInViewer()
-+F4::createFileOnPath(desktop)
-F7::createDirOnPath(desktop)
-^d::Run, %console%, desktop
+#IfWinActive, ahk_exe alacritty.exe
+<^k::^b
+<^Space::^b
 #IfWinActive
 
 ; Directory window
@@ -276,15 +259,11 @@ openSelectionInViewer() {
   Run "%viewer%" "%selection%"
 }
 
-
-#+b::
-  WinGetTitle wTitle, A
-  WinSet Transparent, 100, %wTitle%
-  Sleep 1000
-  WinSet Transparent, Off, %wTitle%
-return
-
 #+q::WinSet AlwaysOnTop, Toggle, A
+
++<^;::
+  showHideAppWin("ahk_exe alacritty.exe", "C:\Program Files\Alacritty\alacritty.exe --config-file C:\home\etc\dotfiles\alacritty\alacritty.toml")
+return
 
 ; ------------------------------------------------------------------------
 ; Functions
@@ -305,7 +284,7 @@ getSelection()
 showHideAppWin(winTitle, appPath) {
   if WinExist(winTitle) {
     if WinActive() {
-      WinMinimize
+      Send !{Tab}
     } else  {
       WinActivate
     }
@@ -324,3 +303,34 @@ showAppWin(winTitle, appPath) {
     Run %appPath%
   }
 }
+
+;---
+; Vim layer
+;---
+
+Escape::Send {Blind}{Escape}
+
+Escape & h::Send {Blind}{Left}
+Escape & j::Send {Blind}{Down}
+Escape & k::Send {Blind}{Up}
+Escape & l::Send {Blind}{Right}
+
+Escape & y::Send {Blind}^{Left}
+Escape & o::Send {Blind}^{Right}
+
+Escape & u::Send {Blind}{Home}
+Escape & i::Send {Blind}{End}
+
+Escape & `;::Send {Blind}{Backspace}
+Escape & p::Send {Blind}{Del}
+
+Escape & '::Send {Blind}^{Backspace}
+
+^;::Send {Blind}^b
+Escape & [::Send {Blind}^b
+
+Escape & m::AltTab
+Escape & n::WinMinimize, A
+Escape & .::Send {Blind}^s
+
+Escape & Space::Send {Blind}!{Space}

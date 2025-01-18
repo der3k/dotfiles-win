@@ -9,14 +9,19 @@ Escape & j::Send {Blind}{Down}
 Escape & k::Send {Blind}{Up}
 Escape & l::Send {Blind}{Right}
 
-Escape & u::Send {Blind}^{Left}
-Escape & i::Send {Blind}^{Right}
+Escape & y::Send {Blind}^{Left}
+Escape & o::Send {Blind}^{Right}
 
-Escape & y::Send {Blind}{Home}
-Escape & o::Send {Blind}{End}
+Escape & u::Send {Blind}{Home}
+Escape & i::Send {Blind}{End}
 
 Escape & `;::Send {Blind}{Backspace}
 Escape & p::Send {Blind}{Del}
+
+Escape & '::Send {Blind}^{Backspace}
+
+^;::Send {Blind}^b
+Escape & [::Send {Blind}^b
 
 Escape & m::AltTab
 Escape & n::WinMinimize, A
