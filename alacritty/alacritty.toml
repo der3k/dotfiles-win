@@ -1,0 +1,18 @@
+[font]
+normal = { family = "IosevkaTerm Nerd Font", style = "Regular" }
+#normal = { family = "AtkynsonMono Nerd Font Mono", style = "Regular" }
+size = 13
+offset = { x = 0, y = 3 }
+bold = { style = "Bold" }
+
+[terminal]
+shell = { program = "wsl.exe", args = ["~"] }
+
+[window]
+decorations = "none"
+dimensions = { columns = 140, lines = 30 }
+position = { x = 0, y = 0 }
+padding = { x = 6, y = 3 }
+
+[mouse]
+hide_when_typing = true
