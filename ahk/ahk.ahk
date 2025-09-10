@@ -319,11 +319,11 @@ Escape & p::Send {Blind}{Del}
 
 Escape & '::Send {Blind}^{Backspace}
 
-^;::Send {Blind}^b
-Escape & [::Send {Blind}^b
-
 Escape & m::AltTab
 Escape & n::WinMinimize, A
 Escape & .::Send {Blind}^s
 
 Escape & Space::Send {Blind}!{Space}
+
+Escape & [::Send {Blind}^#{Left}
+Escape & ]::Send {Blind}^#{Right}
