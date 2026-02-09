@@ -1,17 +1,30 @@
 ﻿#Requires AutoHotkey v2.0
+#SingleInstance Force
 InstallKeybdHook()
 Persistent()
 A_HotkeyInterval := 100
 
 SetKeyDelay(-1)
 
-TraySetIcon("ahk.ico")
+TraySetIcon(A_ScriptDir "\ahk.ico")
 
-home := EnvGet("USER_HOME")
-desktop := EnvGet("USER_DESKTOP")
-console := EnvGet("USER_CONSOLE")
-editor := EnvGet("USER_EDITOR")
-viewer := EnvGet("USER_VIEWER")
+; ------------------------------------------------------------------------
+; Constants
+; ------------------------------------------------------------------------
+EDGE_TOLERANCE := 5
+BORDER_COMPENSATION := 18
+WM_COMMAND := 0x111
+EXPLORER_NEW_FOLDER := 41504
+TILING_STEPS := [0.25, 1 / 3, 0.5, 2 / 3]
+
+; ------------------------------------------------------------------------
+; Environment
+; ------------------------------------------------------------------------
+home := EnvGet("USER_HOME") || A_MyDocuments "\.."
+desktop := EnvGet("USER_DESKTOP") || A_Desktop
+console := EnvGet("USER_CONSOLE") || "wt.exe"
+editor := EnvGet("USER_EDITOR") || "notepad.exe"
+viewer := EnvGet("USER_VIEWER") || "explorer.exe"
 
 SetWorkingDir(desktop)
 
@@ -25,58 +38,11 @@ SetWorkingDir(desktop)
 :O*:p,,::73701
 :O*:o,,::012846595
 
-+<^h:: { ; PAD LEFT
-    GetActiveMonitorWorkArea(&mX, &mY, &mW, &mH)
-    WinGetPos(&x, &y, &w, &h, "A")
-    relWidth := Round((w / mW) * 100, 2)
-    if (x <= mX) {
-        ; active window is left padded
-        if (relWidth <= 25) {
-            ; on 25% or less => PAD LEFT 33.33%
-            WinMove(mX, y, mW / 3, h, "A")
-        } else if (relWidth <= 33.33) {
-            ; on 33.33% or less => PAD LEFT 50%
-            WinMove(mX, y, mW / 2, h, "A")
-        } else if (relWidth <= 50) {
-            ; on 50% or less => PAD LEFT 66.66%
-            WinMove(mX, y, mW * 0.66, h, "A")
-        } else {
-            ; ? => 25% left padded => PAD LEFT 25%
-            WinMove(mX, y, mW / 4, h, "A")
-        }
-    } else {
-        ; PAD LEFT 33.33%
-        WinMove(mX, mY, mW / 3, mH, "A")
-    }
-}
-
-+<^l:: { ; PAD RIGHT
-    GetActiveMonitorWorkArea(&mX, &mY, &mW, &mH)
-    WinGetPos(&x, &y, &w, &h, "A")
-    mRight := mX + mW
-    relWidth := Round((w / mW) * 100, 2)
-    if (x + w >= (mRight - 5)) {
-        ; active window is right padded
-        if (relWidth <= 25) {
-            ; on 25% or less => PAD RIGHT 33.33%
-            WinMove(mRight - mW / 3, y, mW / 3, h, "A")
-        } else if (relWidth <= 33.33) {
-            ; on 33.33% or less => PAD RIGHT 50%
-            WinMove(mRight - mW / 2, y, mW / 2, h, "A")
-        } else if (relWidth <= 50) {
-            ; on 50% or less => PAD RIGHT 66.66%
-            WinMove(mRight - mW * 0.66, y, mW * 0.66, h, "A")
-        } else {
-            ; ? => PAD RIGHT 25%
-            WinMove(mRight - mW / 4, y, mW / 4, h, "A")
-        }
-    } else {
-        ; ? => PAD RIGHT 33.33%
-        WinMove(mRight - mW / 3, mY, mW / 3, mH, "A")
-    }
-}
++<^h:: PadWindow("left")
++<^l:: PadWindow("right")
 
 +<^i:: { ; CENTER
+    global EDGE_TOLERANCE, BORDER_COMPENSATION
     maximized := WinGetMinMax("A")
     if (maximized = 1) {
         WinRestore("A")
@@ -86,10 +52,11 @@ SetWorkingDir(desktop)
     WinGetPos(&x, &y, &w, &h, "A")
     mRight := mX + mW
     relWidth := Round((w / mW) * 100, 2)
-    if (relWidth > 33.33 || (x <= mX && relWidth > 25) || (x + w >= (mRight - 5) && relWidth > 25)) {
-        WinMove(mX + mW / 3 - 18, mY, mW / 3 + 36, mH, "A")
+    bc := BORDER_COMPENSATION
+    if (relWidth > 33.33 || (x <= mX && relWidth > 25) || (x + w >= (mRight - EDGE_TOLERANCE) && relWidth > 25)) {
+        WinMove(mX + mW / 3 - bc, mY, mW / 3 + bc * 2, mH, "A")
     } else {
-        WinMove(mX + mW / 4 - 18, mY, mW / 2 + 36, mH, "A")
+        WinMove(mX + mW / 4 - bc, mY, mW / 2 + bc * 2, mH, "A")
     }
 }
 
@@ -123,7 +90,7 @@ SetWorkingDir(desktop)
     if WinActive("ahk_exe CDViewer.exe") {
         SendInput("^q")
     } else {
-        Send("{Alt down}{Tab}")
+        Send("{Alt down}{Tab}{Alt up}")
     }
 }
 
@@ -134,7 +101,7 @@ SetWorkingDir(desktop)
 }
 
 #^t:: {
-    timeStamp := FormatTime(, "yyyy-MM-dd hh:mm:ss")
+    timeStamp := FormatTime(, "yyyy-MM-dd HH:mm:ss")
     SendInput(timeStamp)
 }
 
@@ -156,13 +123,18 @@ F7:: createDirFromWinTitle()
 
 openDosFromWinTitle() {
     global console
-    dir := WinGetTitle("A")
-    Run(console ' -d "' dir '"')
+    dir := getExplorerPath()
+    if !dir
+        dir := WinGetTitle("A")
+    safeDir := StrReplace(dir, '"', '""')
+    Run(console ' -d "' safeDir '"')
 }
 
 openSelection() {
     global editor
     selection := getSelection()
+    if !selection
+        return
     try
         attribs := FileGetAttrib(selection)
     catch
@@ -174,15 +146,18 @@ openSelection() {
 }
 
 openDir(path) {
-    Run("explorer /n," path)
+    Run('explorer /n,"' path '"')
 }
 
 getDirFromWinTitle() {
-    return WinGetTitle("A")
+    dir := getExplorerPath()
+    return dir ? dir : WinGetTitle("A")
 }
 
 createDirFromWinTitle() {
-    dir := WinGetTitle("A")
+    dir := getExplorerPath()
+    if !dir
+        dir := WinGetTitle("A")
     createDirOnPath(dir)
 }
 
@@ -196,7 +171,9 @@ createDirOnPath(dir) {
 }
 
 createFileFromWinTitle() {
-    dir := WinGetTitle("A")
+    dir := getExplorerPath()
+    if !dir
+        dir := WinGetTitle("A")
     createFileOnPath(dir)
 }
 
@@ -211,13 +188,16 @@ createFileOnPath(dir) {
 }
 
 createDir() {
-    PostMessage(0x111, 41504, 0)  ; refresh
+    global WM_COMMAND, EXPLORER_NEW_FOLDER
+    PostMessage(WM_COMMAND, EXPLORER_NEW_FOLDER, 0)  ; refresh
     SendInput("{AppsKey}wf")
 }
 
 openSelectionInViewer() {
     global viewer
     selection := getSelection()
+    if !selection
+        return
     Run(viewer ' "' selection '"')
 }
 
@@ -231,6 +211,36 @@ openSelectionInViewer() {
 ; ------------------------------------------------------------------------
 ; Functions
 ; ------------------------------------------------------------------------
+
+PadWindow(direction) {
+    global TILING_STEPS, EDGE_TOLERANCE
+    if (WinGetMinMax("A") = 1)
+        WinRestore("A")
+    GetActiveMonitorWorkArea(&mX, &mY, &mW, &mH)
+    WinGetPos(&x, &y, &w, &h, "A")
+    mRight := mX + mW
+    relWidth := Round((w / mW) * 100, 2)
+    isLeft := (direction = "left")
+    isAligned := isLeft ? (x <= mX) : (x + w >= mRight - EDGE_TOLERANCE)
+
+    if !isAligned {
+        ; Not aligned yet => snap to edge at 33%
+        fraction := mW / 3
+        newX := isLeft ? mX : mRight - fraction
+        WinMove(newX, mY, fraction, mH, "A")
+        return
+    }
+    ; Cycle through tiling sizes: 25% → 33% → 50% → 66% → 25%
+    nextFraction := mW * TILING_STEPS[1]  ; default wrap to 25%
+    for i, step in TILING_STEPS {
+        if (relWidth <= step * 100 + 0.5 && i < TILING_STEPS.Length) {
+            nextFraction := mW * TILING_STEPS[i + 1]
+            break
+        }
+    }
+    newX := isLeft ? mX : mRight - nextFraction
+    WinMove(newX, y, nextFraction, h, "A")
+}
 
 GetActiveMonitorWorkArea(&mX, &mY, &mW, &mH) {
     WinGetPos(&wx, &wy, &ww, &wh, "A")
@@ -262,9 +272,24 @@ getSelection() {
     return selection
 }
 
+getExplorerPath() {
+    try {
+        hwnd := WinGetID("A")
+        shell := ComObject("Shell.Application")
+        for window in shell.Windows {
+            try {
+                if (window.HWND = hwnd) {
+                    return window.Document.Folder.Self.Path
+                }
+            }
+        }
+    }
+    return ""
+}
+
 showHideAppWin(winTitle, appPath) {
     if WinExist(winTitle) {
-        if WinActive() {
+        if WinActive(winTitle) {
             Send("!{Tab}")
         } else {
             WinActivate()
