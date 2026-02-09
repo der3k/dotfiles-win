@@ -16,3 +16,6 @@ padding = { x = 6, y = 3 }
 
 [mouse]
 hide_when_typing = true
+
+[general]
+import = ["c:\\home\\etc\\dotfiles\\alacritty\\flexoki-dark.toml"]
