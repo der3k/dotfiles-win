@@ -51,12 +51,11 @@ SetWorkingDir(desktop)
     WinGetPos(&x, &y, &w, &h, "A")
     bc := BORDER_COMPENSATION
     CENTER_STEPS := [1 / 3, 0.5]
-    ; Strip border compensation to get the logical width ratio
-    relWidth := Round(((w - bc * 2) / mW) * 100, 2)
-    ; Find which step we're currently at
+    ; Compare against the full window width (including border compensation)
     currentIdx := 0
     for i, step in CENTER_STEPS {
-        if (Abs(relWidth - step * 100) < 1.5) {
+        expectedW := Round(mW * step + bc * 2)
+        if (Abs(w - expectedW) < 5) {
             currentIdx := i
             break
         }
