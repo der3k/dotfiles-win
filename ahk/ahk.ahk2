@@ -66,7 +66,7 @@ SetWorkingDir(desktop)
     fraction := CENTER_STEPS[nextIdx]
     newW := mW * fraction + bc * 2
     newX := mX + (mW - mW * fraction) / 2 - bc
-    WinMove(newX, mY, newW, mH, "A")
+    WinMove(newX, y, newW, h, "A")
 }
 
 +<^k:: { ; UP
@@ -236,7 +236,7 @@ PadWindow(direction) {
         ; Not aligned yet => snap to edge at 33%
         fraction := mW / 3
         newX := isLeft ? mX : mRight - fraction
-        WinMove(newX, mY, fraction, mH, "A")
+        WinMove(newX, y, fraction, h, "A")
         return
     }
     ; Cycle through tiling sizes: 25% → 33% → 50% → 66% → 25%
